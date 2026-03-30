@@ -73,8 +73,8 @@ while IFS='|' read calName title startDate endDate location rrule; do
 
     if [[ $matched == 1 ]]; then
         # extract time from original start/end for display
-        startTime=$(echo "$startDate" | grep -oi 'at [0-9]*:[0-9]*:[0-9]* [aApP][mM]' | sed 's/at //' | sed 's/:00 / /')
-        endTime=$(echo "$endDate" | grep -oi 'at [0-9]*:[0-9]*:[0-9]* [aApP][mM]' | sed 's/at //' | sed 's/:00 / /')
+        startTime=$(echo "$startDate" | grep -oE '[0-9]+:[0-9]+:[0-9]+.{0,3}[AaPp][Mm]' | sed 's/:00//')
+        endTime=$(echo "$endDate" | grep -oE '[0-9]+:[0-9]+:[0-9]+.{0,3}[AaPp][Mm]' | sed 's/:00//')
         entry="Calendar: $calName\nTitle: $title\nTime: $startTime – $endTime"
         [[ -n $location ]] && entry="$entry\nLocation: $location"
         EVENTS="$EVENTS$entry\n---\n"
