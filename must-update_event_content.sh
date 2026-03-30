@@ -73,8 +73,8 @@ while IFS='|' read calName title startDate endDate location rrule; do
 
     if [[ $matched == 1 ]]; then
         # extract time from original start/end for display
-        startTime=$(echo "$startDate" | grep -o 'at [0-9]*:[0-9]*:[0-9]* [AP]M' | sed 's/at //' | sed 's/:00 / /')
-        endTime=$(echo "$endDate" | grep -o 'at [0-9]*:[0-9]*:[0-9]* [AP]M' | sed 's/at //' | sed 's/:00 / /')
+        startTime=$(echo "$startDate" | grep -oi 'at [0-9]*:[0-9]*:[0-9]* [aApP][mM]' | sed 's/at //' | sed 's/:00 / /')
+        endTime=$(echo "$endDate" | grep -oi 'at [0-9]*:[0-9]*:[0-9]* [aApP][mM]' | sed 's/at //' | sed 's/:00 / /')
         entry="Calendar: $calName\nTitle: $title\nTime: $startTime – $endTime"
         [[ -n $location ]] && entry="$entry\nLocation: $location"
         EVENTS="$EVENTS$entry\n---\n"
@@ -102,10 +102,8 @@ TIMERPID=$!
 wait $OCPID
 kill $TIMERPID 2>/dev/null
 
-ANALYSIS=$(cat /tmp/must-event-raw-output.txt | grep -v "Gateway agent failed" | grep -v "falling back" | grep -v "gateway closed" | grep -v "loopback" | grep -v "compaction")
-
 # save analysis to md file
-echo "$ANALYSIS" > /tmp/must-event.md
+grep -v "Gateway agent failed" /tmp/must-event-raw-output.txt | grep -v "falling back" | grep -v "gateway closed" | grep -v "loopback" | grep -v "compaction" > /tmp/must-event.md
 
 # send email with md attachment via Mail app
 osascript <<EOF
