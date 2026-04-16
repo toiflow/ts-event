@@ -72,7 +72,6 @@ while IFS='|' read calName title startDate endDate location rrule; do
     esac
 
     if [[ $matched == 1 ]]; then
-        # extract time from original start/end for display
         startTime=$(echo "$startDate" | grep -oE '[0-9]+:[0-9]+:[0-9]+.{0,3}[AaPp][Mm]' | sed 's/:00//')
         endTime=$(echo "$endDate" | grep -oE '[0-9]+:[0-9]+:[0-9]+.{0,3}[AaPp][Mm]' | sed 's/:00//')
         entry="Calendar: $calName\nTitle: $title\nTime: $startTime – $endTime"
@@ -81,29 +80,21 @@ while IFS='|' read calName title startDate endDate location rrule; do
     fi
 done <<< "$RAW_EVENTS"
 
-# kill any lingering agent session
-pkill -9 -f "session-id must-update_event_content" 2>/dev/null
-sleep 2
-
-# clear session cache
-setopt NULL_GLOB; rm -f ~/.openclaw/agents/main/sessions/must-update_event_content.jsonl*; unsetopt NULL_GLOB
-
-# run openclaw agent with 120s timeout
-/Users/jayagent/.nvm/versions/node/v22.22.0/bin/openclaw agent --session-id must-update_event_content -m "Do not use any tools. Analyze the following calendar events for tomorrow ($TOMORROW_LABEL) from the 'would' and 'could' calendars. Provide:
+PROMPT="Do not use any tools. Analyze the following calendar events for tomorrow ($TOMORROW_LABEL) from the 'would' and 'could' calendars. Provide:
 1. Overview — list all events in order by time
 2. Time crashes — identify any overlapping or back-to-back events with no buffer
 3. Travel time — flag any events with a location that may need travel time accounted for
 
 Events:
-$EVENTS" > /tmp/must-event-raw-output.txt 2>&1 &
-OCPID=$!
-( sleep 120 && kill -9 $OCPID 2>/dev/null ) &
-TIMERPID=$!
-wait $OCPID
-kill $TIMERPID 2>/dev/null
+$EVENTS"
+
+# run ollama directly
+ANALYSIS=$(curl -s http://127.0.0.1:11434/api/generate \
+  -d "{\"model\":\"qwen2.5:7b\",\"prompt\":$(echo "$PROMPT" | /usr/bin/jq -Rs .),\"stream\":false}" \
+  | /usr/bin/jq -r '.response')
 
 # save analysis to md file
-grep -v "Gateway agent failed" /tmp/must-event-raw-output.txt | grep -v "falling back" | grep -v "gateway closed" | grep -v "loopback" | grep -v "compaction" > /tmp/must-event.md
+echo "$ANALYSIS" > /tmp/must-event.md
 
 # send email with md attachment via Mail app
 osascript <<EOF
