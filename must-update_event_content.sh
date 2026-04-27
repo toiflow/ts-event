@@ -80,7 +80,10 @@ while IFS='|' read calName title startDate endDate location rrule; do
     fi
 done <<< "$RAW_EVENTS"
 
-PROMPT="Do not use any tools. Analyze the following calendar events for tomorrow ($TOMORROW_LABEL) from the 'would' and 'could' calendars. Provide:
+if [[ -z "$EVENTS" ]]; then
+    ANALYSIS="No events scheduled in 'would' or 'could' for $TOMORROW_LABEL."
+else
+    PROMPT="Do not use any tools. Analyze the following calendar events for tomorrow ($TOMORROW_LABEL) from the 'would' and 'could' calendars. Provide:
 1. Overview — list all events in order by time
 2. Time crashes — identify any overlapping or back-to-back events with no buffer
 3. Travel time — flag any events with a location that may need travel time accounted for
@@ -88,10 +91,10 @@ PROMPT="Do not use any tools. Analyze the following calendar events for tomorrow
 Events:
 $EVENTS"
 
-# run ollama directly
-ANALYSIS=$(curl -s http://127.0.0.1:11434/api/generate \
-  -d "{\"model\":\"qwen2.5:7b\",\"prompt\":$(echo "$PROMPT" | /usr/bin/jq -Rs .),\"stream\":false}" \
-  | /usr/bin/jq -r '.response')
+    ANALYSIS=$(curl -s http://127.0.0.1:11434/api/generate \
+      -d "{\"model\":\"qwen2.5:7b\",\"prompt\":$(echo "$PROMPT" | /usr/bin/jq -Rs .),\"stream\":false}" \
+      | /usr/bin/jq -r '.response')
+fi
 
 # save analysis to md file
 echo "$ANALYSIS" > /tmp/must-event.md
