@@ -1,0 +1,72 @@
+name: would-update
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 6pm NZST daily (UTC+12); shifts to 7pm in NZDT (UTC+13)
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    outputs:
+      issue_prompt: ${{ steps.prompts.outputs.issue_prompt }}
+      asset_prompt: ${{ steps.prompts.outputs.asset_prompt }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - id: prompts
+        env:
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+        run: |
+          EVENTS=$(node would-read-md.js)
+          echo "issue_prompt<<SHELL_EVENT_EOF" >> $GITHUB_OUTPUT
+          printf 'You are an executive assistant reviewing tomorrow'\''s calendar. Based on the events below, identify:\n- Any urgent or time-sensitive commitments\n- Preparation or action items required before each event\n- Any conflicts, risks, or blockers to flag\n\nFormat as 3-5 short bullet points starting with a dash and space. One line per bullet. No intro sentence.\n\n' >> $GITHUB_OUTPUT
+          echo "$EVENTS" >> $GITHUB_OUTPUT
+          echo "SHELL_EVENT_EOF" >> $GITHUB_OUTPUT
+          echo "asset_prompt<<SHELL_EVENT_EOF" >> $GITHUB_OUTPUT
+          printf 'You are an executive assistant reviewing tomorrow'\''s calendar. Based on the events below, summarize:\n- Key meetings, commitments, or opportunities\n- Overall shape of the day and priority focus\n- Any follow-ups or decisions likely to arise\n\nFormat as 3-5 short bullet points starting with a dash and space. One line per bullet. No intro sentence.\n\n' >> $GITHUB_OUTPUT
+          echo "$EVENTS" >> $GITHUB_OUTPUT
+          echo "SHELL_EVENT_EOF" >> $GITHUB_OUTPUT
+
+  issue:
+    needs: fetch
+    uses: toiflow/-toiflow/.github/workflows/must-update-content.yml@main
+    with:
+      prompt: ${{ needs.fetch.outputs.issue_prompt }}
+    secrets: inherit
+
+  asset:
+    needs: fetch
+    uses: toiflow/-toiflow/.github/workflows/must-update-content.yml@main
+    with:
+      prompt: ${{ needs.fetch.outputs.asset_prompt }}
+    secrets: inherit
+
+  update:
+    needs: [issue, asset]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Update docs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+          GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+          GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+          ISSUE_ANALYSIS: ${{ needs.issue.outputs.response }}
+          ASSET_ANALYSIS: ${{ needs.asset.outputs.response }}
+        run: node would-update-content.js
+      - name: Update CSV log
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ASSET_ANALYSIS: ${{ needs.asset.outputs.response }}
+        run: node would-update-csv.js
