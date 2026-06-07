@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// would-update-csv.js — append daily asset analysis row to could/-log-asset-v1.csv
+// would-update-csv.js — append daily asset analysis row to would/-log-asset-v1.csv
 // Usage: GITHUB_TOKEN=... ASSET_ANALYSIS=... node would-update-csv.js
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = 'toiflow';
 const GITHUB_REPO  = 'ts-event';
-const CSV_PATH     = 'could/-log-asset-v1.csv';
+const CSV_PATH     = 'would/-log-asset-v1.csv';
 const HEADERS      = 'date,asset_analysis\n';
 
 function nzDate() {
