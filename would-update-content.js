@@ -127,21 +127,21 @@ async function main() {
   const date = nzDate();
   console.log(`📅 ${ts}`);
 
-  const issueFile = await githubGet('would/-content-issue-v1.md');
+  const issueFile = await githubGet('would/CONTENT-ISSUE-V1.md');
   await githubPut(
-    'would/-content-issue-v1.md', issueFile.sha,
+    'would/CONTENT-ISSUE-V1.md', issueFile.sha,
     insertEntry(issueFile.content, `## EVENT:ISSUE ${ts}\n${issueAnalysis}`),
     `would-update: issue ${ts}`
   );
-  console.log('✅ would/-content-issue-v1.md updated');
+  console.log('✅ would/CONTENT-ISSUE-V1.md updated');
 
-  const assetFile = await githubGet('would/-content-asset-v1.md');
+  const assetFile = await githubGet('would/CONTENT-ASSET-V1.md');
   await githubPut(
-    'would/-content-asset-v1.md', assetFile.sha,
+    'would/CONTENT-ASSET-V1.md', assetFile.sha,
     insertEntry(assetFile.content, `## EVENT:ASSET ${ts}\n${assetAnalysis}`),
     `would-update: asset ${ts}`
   );
-  console.log('✅ would/-content-asset-v1.md updated');
+  console.log('✅ would/CONTENT-ASSET-V1.md updated');
 
   if (CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN) {
     await sendEmail(date, issueAnalysis, assetAnalysis);
