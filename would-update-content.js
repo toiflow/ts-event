@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// would-update-content.js — insert event analyses into GitHub would/ files, then email
+// would-update-content.js — insert event analyses into GitHub could/ files, then email
 // Usage: GITHUB_TOKEN=... GMAIL_CLIENT_ID=... GMAIL_CLIENT_SECRET=... GMAIL_REFRESH_TOKEN=... ISSUE_ANALYSIS=... ASSET_ANALYSIS=... node would-update-content.js
 
 const GITHUB_TOKEN  = process.env.GITHUB_TOKEN;
@@ -127,21 +127,21 @@ async function main() {
   const date = nzDate();
   console.log(`📅 ${ts}`);
 
-  const issueFile = await githubGet('would/CONTENT-ISSUE-V1.md');
+  const issueFile = await githubGet('could/CONTENT-ISSUE-V1.md');
   await githubPut(
-    'would/CONTENT-ISSUE-V1.md', issueFile.sha,
+    'could/CONTENT-ISSUE-V1.md', issueFile.sha,
     insertEntry(issueFile.content, `## EVENT:ISSUE ${ts}\n${issueAnalysis}`),
     `would-update: issue ${ts}`
   );
-  console.log('✅ would/CONTENT-ISSUE-V1.md updated');
+  console.log('✅ could/CONTENT-ISSUE-V1.md updated');
 
-  const assetFile = await githubGet('would/CONTENT-ASSET-V1.md');
+  const assetFile = await githubGet('could/CONTENT-ASSET-V1.md');
   await githubPut(
-    'would/CONTENT-ASSET-V1.md', assetFile.sha,
+    'could/CONTENT-ASSET-V1.md', assetFile.sha,
     insertEntry(assetFile.content, `## EVENT:ASSET ${ts}\n${assetAnalysis}`),
     `would-update: asset ${ts}`
   );
-  console.log('✅ would/CONTENT-ASSET-V1.md updated');
+  console.log('✅ could/CONTENT-ASSET-V1.md updated');
 
   if (CLIENT_ID && CLIENT_SECRET && REFRESH_TOKEN) {
     await sendEmail(date, issueAnalysis, assetAnalysis);
