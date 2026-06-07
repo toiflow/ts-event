@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// would-update-csv.js — append daily asset analysis row to would/-log-asset-v1.csv
+// would-update-csv.js â€” append daily asset analysis row to would/LOG-METRIC-V1.csv
 // Usage: GITHUB_TOKEN=... ASSET_ANALYSIS=... node would-update-csv.js
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = 'toiflow';
 const GITHUB_REPO  = 'ts-event';
-const CSV_PATH     = 'would/-log-asset-v1.csv';
+const CSV_PATH     = 'would/LOG-METRIC-V1.csv';
 const HEADERS      = 'date,asset_analysis\n';
 
 function nzDate() {
@@ -54,7 +54,7 @@ async function main() {
   const { sha, content } = await githubGet(CSV_PATH);
   const updated = content + toCsvRow(date, assetAnalysis);
   await githubPut(CSV_PATH, sha, updated, `would-update: log ${date}`);
-  console.log(`✅ ${CSV_PATH} updated`);
+  console.log(`âœ… ${CSV_PATH} updated`);
 }
 
-main().catch(e => { console.error('❌', e.message); process.exit(1); });
+main().catch(e => { console.error('âŒ', e.message); process.exit(1); });
