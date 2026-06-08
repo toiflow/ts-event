@@ -3,9 +3,17 @@
 // Usage: GITHUB_TOKEN=... ASSET_ANALYSIS=... node would-update-csv.js
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const QUARTER = getCurrentQuarter(process.env.QUARTER_OVERRIDE);
+
+function getCurrentQuarter(override) {
+  if (override) return override;
+  const now = new Date();
+  return `${now.getFullYear()}Q${Math.ceil((now.getMonth() + 1) / 3)}`;
+}
+
 const GITHUB_OWNER = 'toiflow';
 const GITHUB_REPO  = 'ts-event';
-const CSV_PATH     = 'would/LOG-METRIC-V1.csv';
+const CSV_PATH     = `would/LOG-METRIC-${QUARTER}.csv`;
 const HEADERS      = 'date,asset_analysis\n';
 
 function nzDate() {

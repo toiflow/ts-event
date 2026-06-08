@@ -80,5 +80,6 @@ jobs:
       - name: Update CSV log
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          QUARTER_OVERRIDE: ${{ inputs.quarter_override }}
           ASSET_ANALYSIS: ${{ needs.asset.outputs.response }}
         run: node would-update-csv.js
