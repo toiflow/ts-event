@@ -19,8 +19,6 @@ jobs:
     secrets: inherit
     with:
       quarter_override: ${{ inputs.quarter_override }}
-    with:
-      quarter_override: ${{ inputs.quarter_override }}
 
   fetch:
     needs: timing
