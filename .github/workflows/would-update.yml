@@ -10,6 +10,9 @@ on:
         type: string
         required: false
 
+permissions:
+  contents: write
+
 jobs:
   timing:
     uses: toiflow/-toiflow/.github/workflows/must-update-timing.yml@main
