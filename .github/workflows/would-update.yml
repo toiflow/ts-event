@@ -4,9 +4,21 @@ on:
   schedule:
     - cron: '0 6 * * *'   # 6pm NZST daily (UTC+12); shifts to 7pm in NZDT (UTC+13)
   workflow_dispatch:
+    inputs:
+      quarter_override:
+        description: 'Override quarter (e.g. 2026Q3) for testing'
+        type: string
+        required: false
 
 jobs:
+  timing:
+    uses: toiflow/-toiflow/.github/workflows/must-update-timing.yml@main
+    secrets: inherit
+    with:
+      quarter_override: ${{ inputs.quarter_override }}
+
   fetch:
+    needs: timing
     runs-on: ubuntu-latest
     outputs:
       issue_prompt: ${{ steps.prompts.outputs.issue_prompt }}
