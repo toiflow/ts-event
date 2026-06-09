@@ -6,6 +6,34 @@ const GITHUB_TOKEN  = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER  = 'toiflow';
 const GITHUB_REPO   = 'ts-event';
 const ANCHOR        = '####### <!-- ANCHOR MARKER - ADD ALL NEW ENTRIES DIRECTLY BELOW THIS LINE, NEVER DELETE OR EDIT PREVIOUS ENTRIES-->';
+const QUARTER       = (() => { const o = process.env.QUARTER_OVERRIDE; if (o) return o; const m = new Date().getMonth() + 1; return new Date().getFullYear() + 'Q' + Math.ceil(m / 3); })();
+
+const ISSUE_HEADER = `ISSUE LOG
+INSTRUCTION FOR AI MODEL:
+
+ALWAYS ADD NEW ISSUE ENTRIES AT THE TOP, DIRECTLY BELOW THIS HEADER.
+
+NEVER DELETE OR EDIT PREVIOUS ISSUE ENTRIES.
+
+REQUIRED FORMAT FOR EACH ISSUE ENTRY:
+
+## ISSUE:{NAME OF ENVIRONMENT} {YYYY-MM-DD HH:MM} → {CONTENT}
+
+${ANCHOR}`;
+
+const ASSET_HEADER = `ASSET LOG
+INSTRUCTION FOR AI MODEL:
+
+ALWAYS ADD NEW ASSET ENTRIES AT THE TOP, DIRECTLY BELOW THIS HEADER.
+
+NEVER DELETE OR EDIT PREVIOUS ASSET ENTRIES.
+
+REQUIRED FORMAT FOR EACH ASSET ENTRY:
+
+## ASSET:{NAME OF ENVIRONMENT} {YYYY-MM-DD HH:MM} → {CONTENT}
+
+${ANCHOR}`;
+
 const CLIENT_ID     = process.env.GMAIL_CLIENT_ID;
 const CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET;
 const REFRESH_TOKEN = process.env.GMAIL_REFRESH_TOKEN;
@@ -28,11 +56,12 @@ function nzDate() {
   }).format(new Date());
 }
 
-async function githubGet(path) {
+async function githubGetOrCreate(path, header) {
   const res = await fetch(
     `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`,
     { headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github+json' } }
   );
+  if (res.status === 404) return { sha: null, content: header };
   if (!res.ok) throw new Error(`GitHub GET ${path} failed: ${res.status}`);
   const data = await res.json();
   return { sha: data.sha, content: Buffer.from(data.content, 'base64').toString('utf8') };
@@ -45,7 +74,7 @@ async function githubPut(path, sha, content, message) {
       method: 'PUT',
       headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message, sha,
+        message, ...(sha ? { sha } : {}),
         content: Buffer.from(content).toString('base64'),
         committer: { name: 'ts-event', email: 'jayreck996@gmail.com' }
       })
@@ -127,7 +156,7 @@ async function main() {
   const date = nzDate();
   console.log(`📅 ${ts}`);
 
-  const issueFile = await githubGet(`could/CONTENT-ISSUE-${QUARTER}.md`);
+  const issueFile = await githubGetOrCreate(`could/CONTENT-ISSUE-${QUARTER}.md`, ISSUE_HEADER);
   await githubPut(
     `could/CONTENT-ISSUE-${QUARTER}.md`, issueFile.sha,
     insertEntry(issueFile.content, `## EVENT:ISSUE ${ts}\n${issueAnalysis}`),
@@ -135,7 +164,7 @@ async function main() {
   );
   console.log(`✅ could/CONTENT-ISSUE-${QUARTER}.md updated`);
 
-  const assetFile = await githubGet(`could/CONTENT-ASSET-${QUARTER}.md`);
+  const assetFile = await githubGetOrCreate(`could/CONTENT-ASSET-${QUARTER}.md`, ASSET_HEADER);
   await githubPut(
     `could/CONTENT-ASSET-${QUARTER}.md`, assetFile.sha,
     insertEntry(assetFile.content, `## EVENT:ASSET ${ts}\n${assetAnalysis}`),
