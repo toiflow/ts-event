@@ -1,4 +1,11 @@
 ####### <!-- ANCHOR MARKER - ADD ALL NEW ENTRIES DIRECTLY BELOW THIS LINE, NEVER DELETE OR EDIT PREVIOUS ENTRIES-->
+## EVENT:ISSUE 2026-06-11 22:05
+- The could-online-podcasts event is scheduled twice, both at 6:00 pm and 9:00 am.
+- Prepare presentation materials for the could-online-assets meeting by 8:30 am.
+- Confirm availability of key attendees for the could-offline-fc event before noon.
+- Review and update news content to be presented in the could-online-news meeting by 8:45 am.
+- Check for any conflicts or overlaps in participants between the could-online-toigroup and could-online-temu meetings.
+
 ## EVENT:ISSUE 2026-06-10 21:40
 - All morning events from 9:00 am to 10:00 am are scheduled at the same time, which may cause scheduling conflicts.
 - Review and update content for "could-online-podcasts," "could-online-assets," "could-online-news," and "could-online-temu" by 8:00 am to ensure timely preparation.
