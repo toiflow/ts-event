@@ -1,4 +1,9 @@
 ####### <!-- ANCHOR MARKER - ADD ALL NEW ENTRIES DIRECTLY BELOW THIS LINE, NEVER DELETE OR EDIT PREVIOUS ENTRIES-->
+## EVENT:ASSET 2026-06-11 22:05
+- Multiple online meetings focused on podcasts, assets, news, and other topics from 9:00 am to 7:00 pm.
+- A key offline meeting with fc is scheduled in the afternoon.
+- Evening sessions will involve additional online activities related to podcasts and tiktoks.
+
 ## EVENT:ASSET 2026-06-10 21:40
 - Multiple online meetings focused on podcasts, assets, news, and Temu from 9:00 am to 10:00 am.
 - Prioritize afternoon meeting on recruitment website AI analysis from 7:30 pm to 8:30 pm.
