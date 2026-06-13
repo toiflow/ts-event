@@ -1,8 +1,8 @@
 name: would-update
 
 on:
-  schedule:
-    - cron: '0 6 * * *'   # 6pm NZST daily (UTC+12); shifts to 7pm in NZDT (UTC+13)
+  # schedule:
+  #   - cron: '0 6 * * *'   # 6pm NZST daily (UTC+12); shifts to 7pm in NZDT (UTC+13)  # parked
   workflow_dispatch:
     inputs:
       quarter_override:
